@@ -26,26 +26,27 @@ type LetStatement struct {
 	Value Expression
 }
 
-func (ls *LetStatement) statementNode() {
+func (ls *LetStatement) statementNode() {}
 
-}
-
-func (ls *LetStatement) TokenLiteral() string {
-	return ls.Token.Literal
-}
+func (ls *LetStatement) TokenLiteral() string { return ls.Token.Literal }
 
 type Identifier struct {
 	Token token.Token // token.IDENT词法单元
 	Value string
 }
 
-func (i *Identifier) expressionNode() {
+func (i *Identifier) expressionNode() {}
 
+func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
+
+type ReturnStatement struct {
+	Token       token.Token // `return`词法单元
+	ReturnValue Expression
 }
 
-func (i *Identifier) TokenLiteral() string {
-	return i.Token.Literal
-}
+func (rs *ReturnStatement) statementNode() {}
+
+func (rs *ReturnStatement) TokenLiteral() string { return rs.Token.Literal }
 
 func (p *Program) TokenLiteral() string {
 	if len(p.Statements) > 0 {
