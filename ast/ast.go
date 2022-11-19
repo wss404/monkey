@@ -20,6 +20,7 @@ type Expression interface {
 	expressionNode()
 }
 
+// Program
 type Program struct {
 	Statements []Statement
 }
@@ -42,6 +43,7 @@ func (p *Program) String() string {
 	return out.String()
 }
 
+// LetStatement
 type LetStatement struct {
 	Token token.Token // token.LET词法单元
 	Name  *Identifier
@@ -68,6 +70,7 @@ func (ls *LetStatement) String() string {
 	return out.String()
 }
 
+// Identifier
 type Identifier struct {
 	Token token.Token // token.IDENT词法单元
 	Value string
@@ -79,6 +82,7 @@ func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
 
 func (i *Identifier) String() string { return i.Value }
 
+// ReturnStatement
 type ReturnStatement struct {
 	Token       token.Token // `return`词法单元
 	ReturnValue Expression
@@ -102,6 +106,7 @@ func (rs *ReturnStatement) String() string {
 	return out.String()
 }
 
+// ExpressionStatement
 type ExpressionStatement struct {
 	Token      token.Token // 表达式中的第一个词法单元
 	Expression Expression
@@ -119,3 +124,13 @@ func (es *ExpressionStatement) String() string {
 	}
 	return ""
 }
+
+// IntegerLiteral
+type IntegerLiteral struct {
+	Token token.Token
+	Value int64
+}
+
+func (il *IntegerLiteral) expressionNode()      {}
+func (il *IntegerLiteral) TokenLiteral() string { return il.Token.Literal }
+func (il *IntegerLiteral) String() string       { return il.Token.Literal }
