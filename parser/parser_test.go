@@ -17,7 +17,7 @@ let foobar = 838383;
 	l := lexer.New(input)
 	p := New(l)
 
-	program := p.ParserProgram()
+	program := p.ParseProgram()
 	checkParserErrors(t, p)
 
 	if program == nil {
@@ -89,7 +89,7 @@ return 993 322;
 	l := lexer.New(input)
 	p := New(l)
 
-	program := p.ParserProgram()
+	program := p.ParseProgram()
 	checkParserErrors(t, p)
 
 	if len(program.Statements) != 3 {
@@ -114,7 +114,7 @@ func TestIdentifierExpression(t *testing.T) {
 
 	l := lexer.New(input)
 	p := New(l)
-	program := p.ParserProgram()
+	program := p.ParseProgram()
 	checkParserErrors(t, p)
 
 	if len(program.Statements) != 1 {
@@ -143,7 +143,7 @@ func TestIntegerLiteralExpression(t *testing.T) {
 
 	l := lexer.New(input)
 	p := New(l)
-	program := p.ParserProgram()
+	program := p.ParseProgram()
 	checkParserErrors(t, p)
 
 	if len(program.Statements) != 1 {
@@ -178,7 +178,7 @@ func TestParsingPrefixExpressions(t *testing.T) {
 	for _, tt := range prefixTests {
 		l := lexer.New(tt.input)
 		p := New(l)
-		program := p.ParserProgram()
+		program := p.ParseProgram()
 		checkParserErrors(t, p)
 
 		if len(program.Statements) != 1 {
@@ -243,7 +243,7 @@ func TestParsingInfixExpressions(t *testing.T) {
 	for _, tt := range infixTests {
 		l := lexer.New(tt.input)
 		p := New(l)
-		program := p.ParserProgram()
+		program := p.ParseProgram()
 		checkParserErrors(t, p)
 
 		if len(program.Statements) != 1 {
@@ -321,7 +321,7 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 	for _, tt := range tests {
 		l := lexer.New(tt.input)
 		p := New(l)
-		program := p.ParserProgram()
+		program := p.ParseProgram()
 		checkParserErrors(t, p)
 
 		actual := program.String()
