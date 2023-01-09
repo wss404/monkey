@@ -6,7 +6,7 @@ import (
 )
 
 func DefineMacros(program *ast.Program, env *object.Environment) {
-	definitions := []int{}
+	var definitions []int
 
 	for i, statement := range program.Statements {
 		if isMacroDefinition(statement) {
@@ -15,7 +15,7 @@ func DefineMacros(program *ast.Program, env *object.Environment) {
 		}
 	}
 
-	for i := len(definitions) - 1; i >= 0; i = i - 1 {
+	for i := len(definitions) - 1; i >= 0; i-- {
 		definitionIndex := definitions[i]
 		program.Statements = append(program.Statements[:definitionIndex], program.Statements[definitionIndex+1:]...)
 	}
