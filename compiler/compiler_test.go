@@ -19,7 +19,7 @@ type compilerTestCase struct {
 func TestIntegerArithmetic(t *testing.T) {
 	tests := []compilerTestCase{
 		{
-			input:             "1+2",
+			input:             "1 + 2",
 			expectedConstants: []interface{}{1, 2},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 0),
@@ -85,7 +85,7 @@ func concatInstructions(s []code.Instructions) code.Instructions {
 		out = append(out, ins...)
 	}
 
-	return nil
+	return out
 }
 
 func testConstants(t *testing.T, expected []interface{}, actual []object.Object) error {
