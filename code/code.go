@@ -47,11 +47,14 @@ func Make(op Opcode, operands ...int) []byte {
 
 	offset := 1
 	for i, o := range operands {
+		// 读取操作数的长度
 		width := def.OperandWidths[i]
 		switch width {
 		case 2:
+			// 将操作数转化为大端存储的字节，存入instruction，一次占据同长度相同的数组单元
 			binary.BigEndian.PutUint16(instruction[offset:], uint16(o))
 		}
+		// 计算偏移量
 		offset += width
 	}
 
