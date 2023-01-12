@@ -48,7 +48,7 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		lastPopped := machine.LastPopStackElem()
+		lastPopped := machine.LastPoppedStackElem()
 		io.WriteString(out, lastPopped.Inspect())
 		io.WriteString(out, "\n")
 	}

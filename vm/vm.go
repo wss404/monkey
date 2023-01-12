@@ -27,6 +27,10 @@ func New(bytecode *compiler.Bytecode) *VM {
 	}
 }
 
+func (vm *VM) LastPoppedStackElem() object.Object {
+	return vm.stack[vm.sp]
+}
+
 func (vm *VM) StackTop() object.Object {
 	if vm.sp == 0 {
 		return nil
@@ -46,14 +50,12 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
-		case code.OpAdd:
-			right := vm.pop()
-			left := vm.pop()
-			leftValue := left.(*object.Integer).Value
-			rightValue := right.(*object.Integer).Value
 
-			result := leftValue + rightValue
-			vm.push(&object.Integer{Value: result})
+		case code.OpAdd, code.OpSub, code.OpMul, code.OpDiv:
+			err := vm.executeBinaryOperation(op)
+			if err != nil {
+				return err
+			}
 
 		case code.OpPop:
 			vm.pop()
@@ -62,10 +64,6 @@ func (vm *VM) Run() error {
 	}
 
 	return nil
-}
-
-func (vm *VM) LastPopStackElem() object.Object {
-	return vm.stack[vm.sp]
 }
 
 func (vm *VM) push(o object.Object) error {
@@ -83,4 +81,40 @@ func (vm *VM) pop() object.Object {
 	o := vm.stack[vm.sp-1]
 	vm.sp--
 	return o
+}
+
+func (vm *VM) executeBinaryOperation(op code.Opcode) error {
+	right := vm.pop()
+	left := vm.pop()
+
+	leftType := left.Type()
+	rightType := right.Type()
+
+	if leftType == object.INTEGER_OBJ && rightType == object.INTEGER_OBJ {
+		return vm.executeBinaryIntegerOperation(op, left, right)
+	}
+
+	return fmt.Errorf("unsupported types for binary operation: %s %s", leftType, rightType)
+}
+
+func (vm *VM) executeBinaryIntegerOperation(op code.Opcode, left, right object.Object) error {
+	leftValue := left.(*object.Integer).Value
+	rightValue := right.(*object.Integer).Value
+
+	var result int64
+
+	switch op {
+	case code.OpAdd:
+		result = leftValue + rightValue
+	case code.OpSub:
+		result = leftValue - rightValue
+	case code.OpMul:
+		result = leftValue * rightValue
+	case code.OpDiv:
+		result = leftValue / rightValue
+	default:
+		return fmt.Errorf("unknown integer operator: %d", op)
+	}
+
+	return vm.push(&object.Integer{Value: result})
 }
