@@ -118,7 +118,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 
 	case *ast.IntegerLiteral:
 		integer := &object.Integer{Value: node.Value}
-		c.emit(code.OpConstant, c.addConstants(integer))
+		c.emit(code.OpConstant, c.addConstant(integer))
 
 	case *ast.Boolean:
 		if node.Value {
@@ -215,7 +215,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 
 	case *ast.StringLiteral:
 		str := &object.String{Value: node.Value}
-		c.emit(code.OpConstant, c.addConstants(str))
+		c.emit(code.OpConstant, c.addConstant(str))
 
 	case *ast.ArrayLiteral:
 		for _, el := range node.Elements {
@@ -276,10 +276,14 @@ func (c *Compiler) Compile(node ast.Node) error {
 			c.emit(code.OpReturn)
 		}
 
+		numLocals := c.symbolTable.numDefinitions
 		instructions := c.leaveScope()
 
-		compiledFn := &object.CompiledFunction{Instructions: instructions}
-		c.emit(code.OpConstant, c.addConstants(compiledFn))
+		compiledFn := &object.CompiledFunction{
+			Instructions: instructions,
+			NumLocals:    numLocals,
+		}
+		c.emit(code.OpConstant, c.addConstant(compiledFn))
 
 	case *ast.ReturnStatement:
 		err := c.Compile(node.ReturnValue)
@@ -312,7 +316,7 @@ func (c *Compiler) currentInstructions() code.Instructions {
 	return c.scopes[c.scopeIndex].instructions
 }
 
-func (c *Compiler) addConstants(obj object.Object) int {
+func (c *Compiler) addConstant(obj object.Object) int {
 	c.constants = append(c.constants, obj)
 	return len(c.constants) - 1
 }
