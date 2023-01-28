@@ -1,5 +1,7 @@
 package ast
 
+// 采用递归下降语法分析
+
 import (
 	"bytes"
 	"fmt"
