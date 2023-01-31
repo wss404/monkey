@@ -8,6 +8,7 @@ import (
 	"strconv"
 )
 
+// 定义运算符的优先级
 const (
 	_ int = iota
 	LOWEST
@@ -34,15 +35,17 @@ var precedences = map[token.TokenType]int{
 }
 
 type (
+	// 前缀解析函数
 	prefixParseFn func() ast.Expression
-	infixParseFn  func(ast.Expression) ast.Expression
+	// 中缀解析函数，参数为运算符左侧的内容
+	infixParseFn func(ast.Expression) ast.Expression
 )
 
 type Parser struct {
 	l *lexer.Lexer
 
-	curToken  token.Token
-	peekToken token.Token
+	curToken  token.Token // 同Lexer.position
+	peekToken token.Token // 同Lexer.readPosition
 
 	errors []string
 
@@ -116,6 +119,7 @@ func (p *Parser) peekTokenIs(t token.TokenType) bool {
 	return p.peekToken.Type == t
 }
 
+// 移动paser的curToken并从lexer读取下一token
 func (p *Parser) nextToken() {
 	p.curToken = p.peekToken
 	p.peekToken = p.l.NextToken()
@@ -216,6 +220,7 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 	stmt := &ast.ExpressionStatement{Token: p.curToken}
 	stmt.Expression = p.parseExpression(LOWEST)
 
+	// 结尾的分号是可选项
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
@@ -223,7 +228,9 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 	return stmt
 }
 
+// 实现普拉特语法分析器的关键，优先级的定义很重要
 func (p *Parser) parseExpression(precedence int) ast.Expression {
+	// 尝试将当前token解析为前缀式
 	prefix := p.prefixParseFns[p.curToken.Type]
 	if prefix == nil {
 		p.noPrefixParseFnError(p.curToken.Type)
@@ -231,15 +238,20 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 	}
 	leftExp := prefix()
 
+	// 如果后续还有合法token且下一token的优先级小于当前优先级，则将leftExp作为中缀表达式的参数
 	for !p.peekTokenIs(token.SEMICOLON) && precedence < p.peekPrecedence() {
+		// 获取中缀表达式的解析函数
 		infix := p.infixParseFns[p.peekToken.Type]
 
 		if infix == nil {
+			fmt.Printf("infix nil: %s\n", leftExp)
 			return leftExp
 		}
 
+		// 移动指针到下一token
 		p.nextToken()
 
+		// 执行中缀表达式的解析函数，将结果作为下一轮循环的leftExp
 		leftExp = infix(leftExp)
 	}
 
@@ -292,6 +304,7 @@ func (p *Parser) parseGroupedExpression() ast.Expression {
 	p.nextToken()
 	exp := p.parseExpression(LOWEST)
 
+	// 未定义token.RPAREN 的优先级，查找其优先级时将返回0，比LOWEST还低，此时从parseExpression返回
 	if !p.expectPeek(token.RPAREN) {
 		return nil
 	}
