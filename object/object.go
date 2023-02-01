@@ -28,6 +28,7 @@ const (
 	CLOSURE_OBJ           = "CLOSURE_OBJ"
 )
 
+// Object 用对象表示值
 type Object interface {
 	Type() ObjectType
 	Inspect() string

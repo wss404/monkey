@@ -6,6 +6,7 @@ import (
 	"monkey/object"
 )
 
+// 在值系统中指向同一个object的变量类型
 var (
 	NULL  = &object.Null{}
 	TRUE  = &object.Boolean{Value: true}
@@ -21,6 +22,7 @@ var builtins = map[string]*object.Builtin{
 	"push":  object.GetBuiltinByName("push"),
 }
 
+// Eval 将node解析为值，并返回对应类型的object
 func Eval(node ast.Node, env *object.Environment) object.Object {
 	switch node := node.(type) {
 
@@ -151,6 +153,7 @@ func extendFunctionEnv(fn *object.Function, args []object.Object) *object.Enviro
 }
 
 func unwrapReturnValue(obj object.Object) object.Object {
+	// 对object.ReturnValue进行解包，否则会影响外部调用（遇到ReturnValue直接返回）
 	if returnValue, ok := obj.(*object.ReturnValue); ok {
 		return returnValue.Value
 	}
