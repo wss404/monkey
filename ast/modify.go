@@ -2,6 +2,7 @@ package ast
 
 type ModifierFunc func(Node) Node
 
+// Modify 对node求值，返回对应对node
 func Modify(node Node, modifier ModifierFunc) Node {
 	switch node := node.(type) {
 	case *Program:

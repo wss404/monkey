@@ -5,6 +5,7 @@ import (
 	"monkey/object"
 )
 
+// DefineMacros 在AST中查找宏定义并将其从AST中删除（从AST中提取宏并将其保存）
 func DefineMacros(program *ast.Program, env *object.Environment) {
 	var definitions []int
 
@@ -21,6 +22,7 @@ func DefineMacros(program *ast.Program, env *object.Environment) {
 	}
 }
 
+// ExpandMacros 展开宏
 func ExpandMacros(program ast.Node, env *object.Environment) ast.Node {
 	return ast.Modify(program, func(node ast.Node) ast.Node {
 		callExpression, ok := node.(*ast.CallExpression)
