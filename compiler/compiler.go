@@ -61,6 +61,7 @@ func NewWithState(s *SymbolTable, constants []object.Object) *Compiler {
 	return compiler
 }
 
+// Compile 将节点编译为指令和操作数
 func (c *Compiler) Compile(node ast.Node) error {
 	switch node := node.(type) {
 	case *ast.Program:
@@ -154,20 +155,23 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return err
 		}
 
-		// 此处偏移量为虚假值
+		// 此处偏移量为虚假值，保留跳转指令的位置 -> 条件不为真时的跳转地址
 		jumpNotTruthyPos := c.emit(code.OpJumpNotTruthy, 9999)
 		err = c.Compile(node.Consequence)
 		if err != nil {
 			return err
 		}
+		// 如果consequence的最后一条为OpPop，则将其移除，保证if语句有值
 		if c.lastInstructionIs(code.OpPop) {
 			c.removeLastPop()
 		}
 
-		// 发出带有虚假偏移量的OpJump
+		// 发出带有虚假偏移量的OpJump -> 执行完consequence后的跳转地址
 		jumpPos := c.emit(code.OpJump, 9999)
 
+		// 保留要跳转到的位置
 		afterConsequencePos := len(c.currentInstructions())
+		// 将虚假偏移量替换为要跳转到的位置
 		c.changeOperand(jumpNotTruthyPos, afterConsequencePos)
 
 		if node.Alternative == nil {
@@ -183,7 +187,9 @@ func (c *Compiler) Compile(node ast.Node) error {
 			}
 		}
 
+		// 编译备选结果后的指令长度，即条件为真，执行完consequence后的跳转地址
 		afterAlternativePos := len(c.currentInstructions())
+		// 替换jumpPos处的跳转地址
 		c.changeOperand(jumpPos, afterAlternativePos)
 
 	case *ast.BlockStatement:
@@ -345,6 +351,7 @@ func (c *Compiler) addConstant(obj object.Object) int {
 	return len(c.constants) - 1
 }
 
+// 将指令编译为字节码并添加到c.instructions
 func (c *Compiler) emit(op code.Opcode, operands ...int) int {
 	ins := code.Make(op, operands...)
 	pos := c.addInstruction(ins)
@@ -363,6 +370,7 @@ func (c *Compiler) addInstruction(ins []byte) int {
 	return posNewInstruction
 }
 
+// 记录最后一条指令和上一条指令
 func (c *Compiler) setLastInstruction(op code.Opcode, pos int) {
 	previous := c.scopes[c.scopeIndex].lastInstruction
 	last := EmittedInstruction{Opcode: op, Position: pos}
@@ -419,10 +427,13 @@ func (c *Compiler) leaveScope() code.Instructions {
 	return instructions
 }
 
+// 修改对应指令的操作数
 func (c *Compiler) changeOperand(opPos int, operand int) {
+	// 重新创建指令字节码
 	op := code.Opcode(c.currentInstructions()[opPos])
 	newInstruction := code.Make(op, operand)
 
+	// 完全替换
 	c.replaceInstruction(opPos, newInstruction)
 }
 

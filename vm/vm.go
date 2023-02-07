@@ -316,6 +316,7 @@ func (vm *VM) Run() error {
 	return nil
 }
 
+// 将指令压栈
 func (vm *VM) push(o object.Object) error {
 	if vm.sp >= StackSize {
 		return fmt.Errorf("stack overflow")

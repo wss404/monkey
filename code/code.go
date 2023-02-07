@@ -90,20 +90,25 @@ func Lookup(op byte) (*Definition, error) {
 	return def, nil
 }
 
+// Make 编译指令和操作数为字节码[]byte
 func Make(op Opcode, operands ...int) []byte {
+	// 读取指令
 	def, ok := definitions[op]
 	if !ok {
 		return []byte{}
 	}
 
+	// 计算指令字节码长度
 	instructionLen := 1
 	for _, w := range def.OperandWidths {
 		instructionLen += w
 	}
 
+	// 字节码第一个元素为指令
 	instruction := make([]byte, instructionLen)
 	instruction[0] = byte(op)
 
+	// 将操作数依次加入字节码中
 	offset := 1
 	for i, o := range operands {
 		// 读取操作数的长度
