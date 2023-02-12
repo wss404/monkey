@@ -219,6 +219,7 @@ func (m *Macro) Inspect() string {
 	return out.String()
 }
 
+// CompiledFunction 保存从函数字面量编译中获得的code.Instructions
 type CompiledFunction struct {
 	Instructions  code.Instructions
 	NumLocals     int

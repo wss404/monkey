@@ -270,6 +270,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 		c.emit(code.OpIndex)
 
 	case *ast.FunctionLiteral:
+		// 在编译函数时，更改发出指令的存储位置
 		c.enterScope()
 
 		if node.Name != "" {
@@ -404,6 +405,7 @@ func (c *Compiler) replaceInstruction(pos int, newInstruction []byte) {
 	}
 }
 
+// 进入作用域范围，在一个作用域内发出的指令不应对另一作用域内的指令产生影响
 func (c *Compiler) enterScope() {
 	scope := CompilationScope{
 		instructions:        code.Instructions{},

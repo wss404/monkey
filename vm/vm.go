@@ -21,7 +21,7 @@ type VM struct {
 	stack []object.Object
 	sp    int
 
-	globals []object.Object
+	globals []object.Object // 全局存储
 
 	frames      []*Frame
 	framesIndex int
@@ -144,15 +144,19 @@ func (vm *VM) Run() error {
 			}
 
 		case code.OpSetGlobal:
+			// 读取操作数
 			globalIndex := code.ReadUint16(ins[ip+1:])
 			vm.currentFrame().ip += 2
 
+			// 弹栈，得到绑定到名称的值，将其保存到vm.globals中
 			vm.globals[globalIndex] = vm.pop()
 
 		case code.OpGetGlobal:
+			// 读取操作数
 			globalIndex := code.ReadUint16(ins[ip+1:])
 			vm.currentFrame().ip += 2
 
+			// 从globals中取值并将其压栈
 			err := vm.push(vm.globals[globalIndex])
 			if err != nil {
 				return err

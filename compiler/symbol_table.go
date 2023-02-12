@@ -10,6 +10,7 @@ const (
 	FunctionScope SymbolScope = "FUNCTION"
 )
 
+// Symbol 符号 包含标识符的位置、所在作用域、是否已经被定义、绑定值的类型等信息
 type Symbol struct {
 	Name  string
 	Scope SymbolScope
