@@ -32,10 +32,13 @@ func NewSymbolTable() *SymbolTable {
 }
 
 func (s *SymbolTable) Define(name string) Symbol {
+	// 定义符号
 	symbol := Symbol{Name: name, Index: s.numDefinitions, Scope: GlobalScope}
 	if s.Outer == nil {
+		// 作用域设置为全局
 		symbol.Scope = GlobalScope
 	} else {
+		// 作用域设置为局部
 		symbol.Scope = LocalScope
 	}
 

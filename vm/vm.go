@@ -103,13 +103,14 @@ func (vm *VM) Run() error {
 	var op code.Opcode
 
 	for vm.currentFrame().ip < len(vm.currentFrame().Instructions())-1 {
+		// Frame指令指针初始为-1，从0循环到len - 1
 		vm.currentFrame().ip++
 
 		ip = vm.currentFrame().ip
-		ins = vm.currentFrame().Instructions()
-		op = code.Opcode(ins[ip])
+		ins = vm.currentFrame().Instructions() // 读取当前栈帧的指令
+		op = code.Opcode(ins[ip])              // 将指令指针处的指令转换为操作码
 
-		switch op {
+		switch op { // 根据指令类别执行操作
 		case code.OpConstant:
 			constIndex := code.ReadUint16(ins[ip+1:])
 			vm.currentFrame().ip += 2
@@ -244,10 +245,10 @@ func (vm *VM) Run() error {
 			}
 
 		case code.OpReturnValue:
-			returnValue := vm.pop()
+			returnValue := vm.pop() // 取出返回值放到一边
 
-			frame := vm.popFrame()
-			vm.sp = frame.basePointer - 1
+			frame := vm.popFrame()        // 从帧的栈中弹出刚刚执行的帧
+			vm.sp = frame.basePointer - 1 // 重置栈指针为帧的basePointer
 
 			err := vm.push(returnValue)
 			if err != nil {
@@ -525,6 +526,7 @@ func (vm *VM) buildHash(startIndex, endIndex int) (object.Object, error) {
 	return &object.Hash{Pairs: hashPairs}, nil
 }
 
+// 创建一个包含对这个函数引用的新栈帧，将其推送到栈中
 func (vm *VM) callClosure(cl *object.Closure, numArgs int) error {
 	if numArgs != cl.Fn.NumParameters {
 		return fmt.Errorf("wrong number of arguments: want=%d, got=%d", cl.Fn.NumParameters, numArgs)
