@@ -277,6 +277,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 			c.symbolTable.DefineFunctionName(node.Name)
 		}
 		for _, p := range node.Parameters {
+			// 将函数的参数定义为局部绑定，这让符号表在编译函数体时也能够解析新引用并将它们视为局部变量
 			c.symbolTable.Define(p.Value)
 		}
 

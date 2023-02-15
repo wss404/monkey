@@ -233,7 +233,7 @@ func (cf *CompiledFunction) Inspect() string {
 
 type Closure struct {
 	Fn   *CompiledFunction
-	Free []Object
+	Free []Object // 自由变量：1、既不在当前局部作用域中定义的变量，也不是当前函数的参数；2、在局部使用但在封闭作用域内定义的变量
 }
 
 func (c *Closure) Type() ObjectType { return CLOSURE_OBJ }
