@@ -273,6 +273,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 		// 在编译函数时，更改发出指令的存储位置
 		c.enterScope()
 
+		// 解决自引用问题：进入新的编译作用域后，将函数名添加到符号表中，
 		if node.Name != "" {
 			c.symbolTable.DefineFunctionName(node.Name)
 		}
@@ -293,10 +294,12 @@ func (c *Compiler) Compile(node ast.Node) error {
 			c.emit(code.OpReturn)
 		}
 
+		// 保存自由变量
 		freeSymbols := c.symbolTable.FreeSymbols
 		numLocals := c.symbolTable.numDefinitions
 		instructions := c.leaveScope()
 
+		// 将自由变量压栈
 		for _, s := range freeSymbols {
 			c.loadSymbol(s)
 		}
@@ -307,6 +310,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 			NumParameters: len(node.Parameters),
 		}
 
+		// 发出OpClosure指令
 		fnIndex := c.addConstant(compiledFn)
 		c.emit(code.OpClosure, fnIndex, len(freeSymbols))
 
@@ -458,6 +462,7 @@ func (c *Compiler) loadSymbol(s Symbol) {
 	case FreeScope:
 		c.emit(code.OpGetFree, s.Index)
 	case FunctionScope:
+		// 加载函数作用域符号时发出OpCurrentClosure指令
 		c.emit(code.OpCurrentClosure)
 	}
 }

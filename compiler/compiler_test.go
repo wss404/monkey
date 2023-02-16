@@ -755,20 +755,22 @@ func TestClosures(t *testing.T) {
 			}
 			`,
 			expectedConstants: []interface{}{
+				// 内部函数
 				[]code.Instructions{
-					code.Make(code.OpGetFree, 0),
-					code.Make(code.OpGetLocal, 0),
+					code.Make(code.OpGetFree, 0),  // 获取自由变量a
+					code.Make(code.OpGetLocal, 0), // 获取局部变量b
 					code.Make(code.OpAdd),
 					code.Make(code.OpReturnValue),
 				},
+				// 外部函数
 				[]code.Instructions{
-					code.Make(code.OpGetLocal, 0),
-					code.Make(code.OpClosure, 0, 1),
+					code.Make(code.OpGetLocal, 0),   // 将a压栈
+					code.Make(code.OpClosure, 0, 1), // a被保存到Free字段中
 					code.Make(code.OpReturnValue),
 				},
 			},
 			expectedInstructions: []code.Instructions{
-				code.Make(code.OpClosure, 1, 0),
+				code.Make(code.OpClosure, 1, 0), // 创建闭包
 				code.Make(code.OpPop),
 			},
 		},
@@ -784,22 +786,22 @@ func TestClosures(t *testing.T) {
 			`,
 			expectedConstants: []interface{}{
 				[]code.Instructions{
-					code.Make(code.OpGetFree, 0),
-					code.Make(code.OpGetFree, 1),
+					code.Make(code.OpGetFree, 0), // 获取a
+					code.Make(code.OpGetFree, 1), // 获取b
 					code.Make(code.OpAdd),
-					code.Make(code.OpGetLocal, 0),
+					code.Make(code.OpGetLocal, 0), // 获取c
 					code.Make(code.OpAdd),
 					code.Make(code.OpReturnValue),
 				},
 				[]code.Instructions{
-					code.Make(code.OpGetFree, 0),
-					code.Make(code.OpGetLocal, 0),
-					code.Make(code.OpClosure, 0, 2),
+					code.Make(code.OpGetFree, 0),    // 获取a
+					code.Make(code.OpGetLocal, 0),   // 获取b
+					code.Make(code.OpClosure, 0, 2), // 将a、b包装到Free中
 					code.Make(code.OpReturnValue),
 				},
 				[]code.Instructions{
-					code.Make(code.OpGetLocal, 0),
-					code.Make(code.OpClosure, 1, 1),
+					code.Make(code.OpGetLocal, 0),   // 获取a
+					code.Make(code.OpClosure, 1, 1), // 将a包装到Free中
 					code.Make(code.OpReturnValue),
 				},
 			},

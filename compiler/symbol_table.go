@@ -7,7 +7,7 @@ const (
 	LocalScope    SymbolScope = "LOCAL"
 	BuiltinScope  SymbolScope = "BUILTIN"
 	FreeScope     SymbolScope = "FREE"
-	FunctionScope SymbolScope = "FUNCTION"
+	FunctionScope SymbolScope = "FUNCTION" // 函数作用域
 )
 
 // Symbol 符号 包含标识符的位置、所在作用域、是否已经被定义、绑定值的类型等信息
@@ -71,6 +71,7 @@ func (s *SymbolTable) DefineBuiltin(index int, name string) Symbol {
 	return symbol
 }
 
+// DefineFunctionName 为函数名创建函数作用域符号
 func (s *SymbolTable) DefineFunctionName(name string) Symbol {
 	symbol := Symbol{Name: name, Index: 0, Scope: FunctionScope}
 	s.store[name] = symbol

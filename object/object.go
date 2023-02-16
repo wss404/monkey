@@ -231,6 +231,7 @@ func (cf *CompiledFunction) Inspect() string {
 	return fmt.Sprintf("CompiledFunction[%p]", cf)
 }
 
+// Closure 实现闭包的步骤：在编译函数时检测对自由变量的引用，将引用的值放到栈中，将值和编译后的函数合并到一个闭包中，将其留在栈中，以便调用
 type Closure struct {
 	Fn   *CompiledFunction
 	Free []Object // 自由变量：1、既不在当前局部作用域中定义的变量，也不是当前函数的参数；2、在局部使用但在封闭作用域内定义的变量

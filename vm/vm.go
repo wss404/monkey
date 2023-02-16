@@ -79,6 +79,7 @@ func (vm *VM) popFrame() *Frame {
 	return vm.frames[vm.framesIndex]
 }
 
+// 参数：已编译函数在常量池中的索引、在栈中等待的自由变量的数量
 func (vm *VM) pushClosure(constIndex, numFree int) error {
 	constant := vm.constants[constIndex]
 	function, ok := constant.(*object.CompiledFunction)
@@ -184,6 +185,7 @@ func (vm *VM) Run() error {
 
 		case code.OpCurrentClosure:
 			currentClosure := vm.currentFrame().cl
+			// 获取当前帧并将其压栈
 			err := vm.push(currentClosure)
 			if err != nil {
 				return err
@@ -256,6 +258,7 @@ func (vm *VM) Run() error {
 			}
 
 		case code.OpClosure:
+			// 将自由变量转移到闭包并将它们压栈
 			constIndex := code.ReadUint16(ins[ip+1:])
 			numFree := code.ReadUint8(ins[ip+3:])
 			vm.currentFrame().ip += 3
